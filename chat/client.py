@@ -1,4 +1,4 @@
-from serverinterface import *
+from serverinterfacesim import *
 print "Welcome to KChat!"
 print "...It doesn't do much yet"
 
@@ -16,7 +16,8 @@ while login == False:
     if login == False:
         print "Invalid username or password. Try again."
 
-
+serverInterface.setStatus('online')
+print "You are logged in as",username
 #have them type a message
 #check the server for messages
 
