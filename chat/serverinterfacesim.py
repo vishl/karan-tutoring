@@ -1,7 +1,7 @@
 #a simulated server interface
 class ServerInterface:
     def __init__(self):
-        self.sent = True
+        self.read = False
 
     #connection always succeeds
     def connect(self, ip):
@@ -18,9 +18,10 @@ class ServerInterface:
         return True
 
     def checkForMessages(self):
-        if(self.sent):
+        if(self.read):
             return None
         else:
+            self.read = True
             return [
                     {
                         "from":"friend1", 
