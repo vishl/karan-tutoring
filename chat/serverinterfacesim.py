@@ -21,7 +21,16 @@ class ServerInterface:
         if(self.sent):
             return None
         else:
-            return [{"friend1", ["message1"]}]
+            return [
+                    {
+                        "from":"friend1", 
+                        "message":"message1"
+                    },
+                    {
+                        "from":"friend2", 
+                        "message":"message2"
+                    }
+                    ]
 
     def setStatus(self, status):
         return True
