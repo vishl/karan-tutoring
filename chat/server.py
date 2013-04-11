@@ -1,4 +1,5 @@
 import sys
+import cgi
 import BaseHTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 
@@ -10,20 +11,39 @@ class Handler(SimpleHTTPRequestHandler):
             self.valid()
             self.login()
         else:
-            self.invalid()
+            self.invalid(404, "Invalid path")
             self.wfile.write("Path = " + self.path)
+    def do_POST(self):
+        ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+        if ctype == 'multipart/form-data':
+            postvars = cgi.parse_multipart(self.rfile, pdict)
+        elif ctype == 'application/x-www-form-urlencoded':
+            length = int(self.headers.getheader('content-length'))
+            postvars = cgi.parse_qs(self.rfile.read(length), keep_blank_values=1)
+        else:
+            postvars = {}
+        if(self.path=="/login"):
+            self.valid()
+            self.login(postvars)
+        else:
+            self.invalid(404, "Invalid path:" + self.path)
 
     def valid(self):
         self.send_response(200)
         self.send_header('Content-type','text/html')
         self.end_headers()
-    def invalid(self):
-        self.send_response(400)
+    def invalid(self, code, message):
+        self.send_response(code)
         self.send_header('Content-type','text/html')
         self.end_headers()
+        self.wfile.write(message)
 
-    def login(self):
-        print self.headers
+    def login(self, params):
+        l = params["user"]
+        user = None
+        if(l!=None):
+
+        print params
 
 class DataManager():
     def __init__(self):
