@@ -23,6 +23,8 @@ class DataManager():
             (user, password) = lines[i].strip().split(',')
             users[user] = password
         return users
+    def enqueMessage(fromId, toId, message):
+        pass
 
 
 dataManager = DataManager()
@@ -31,9 +33,12 @@ class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
         if(self.path=="/"):
             self.wfile.write("root")
-        elif(self.path=="/login"):
+        if(self.path=="/hello"):
             self.valid()
-            self.login()
+            self.wfile.write("Hello")
+        elif(self.path=="/messages"):
+            self.valid()
+            self.getMessages()
         else:
             self.invalid(404, "Invalid path")
             self.wfile.write("Path = " + self.path)
@@ -49,7 +54,7 @@ class Handler(SimpleHTTPRequestHandler):
         if(self.path=="/login"):
             self.valid()
             self.login(postvars)
-        if(self.path=="/sendmessage"):
+        elif(self.path=="/sendmessage"):
             self.valid()
             self.send(postvars)
         else:
@@ -86,6 +91,7 @@ class Handler(SimpleHTTPRequestHandler):
         if("senderId" in params and "recipientId" in params and "message" in params):
             if(params["recipientId"][0] in dataManager.users):
                 print "Sending from: %s to: %s message %s" % (params["senderId"][0], params["recipientId"][0], params["message"][0])
+                self.data.enqueueMessage(params["senderId"][0], params["recipientId"][0], params["message"][0])
             else:
                 success = False
         else:
