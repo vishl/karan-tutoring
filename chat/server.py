@@ -1,12 +1,16 @@
 import sys
 import cgi
+import json
+import pdb
 import BaseHTTPServer
 from SimpleHTTPServer import SimpleHTTPRequestHandler
+#import urlparse
 
 class DataManager():
     def __init__(self):
         self.users = None
         self.userFile = "users.csv"
+        self.messages = {}
         pass
 
     def getUsers(self):
@@ -23,22 +27,31 @@ class DataManager():
             (user, password) = lines[i].strip().split(',')
             users[user] = password
         return users
-    def enqueMessage(fromId, toId, message):
-        pass
+    
+    def enqueueMessage(self, fromId, toId, message):
+        if toId not in self.messages:
+            self.messages[toId] = []
+        self.messages[toId].append({"from":fromId, "message":message})
+
+    def dequeueMessages(self, toId):
+        if(toId not in self.messages):
+            return []
+        ret = self.messages[toId]
+        self.messages[toId] = []
+        return ret
 
 
 dataManager = DataManager()
 
 class Handler(SimpleHTTPRequestHandler):
     def do_GET(self):
+#        parsed = urlparse.urlparse(self.path)
+#        query = urlparse.parse_qs(parsed.query)
         if(self.path=="/"):
             self.wfile.write("root")
         if(self.path=="/hello"):
             self.valid()
             self.wfile.write("Hello")
-        elif(self.path=="/messages"):
-            self.valid()
-            self.getMessages()
         else:
             self.invalid(404, "Invalid path")
             self.wfile.write("Path = " + self.path)
@@ -57,6 +70,9 @@ class Handler(SimpleHTTPRequestHandler):
         elif(self.path=="/sendmessage"):
             self.valid()
             self.send(postvars)
+        elif(self.path=="/checkmessage"):
+            self.valid()
+            self.getMessages(postvars)
         else:
             self.invalid(404, "Invalid path:" + self.path)
 
@@ -91,7 +107,8 @@ class Handler(SimpleHTTPRequestHandler):
         if("senderId" in params and "recipientId" in params and "message" in params):
             if(params["recipientId"][0] in dataManager.users):
                 print "Sending from: %s to: %s message %s" % (params["senderId"][0], params["recipientId"][0], params["message"][0])
-                self.data.enqueueMessage(params["senderId"][0], params["recipientId"][0], params["message"][0])
+                dataManager.enqueueMessage(params["senderId"][0], params["recipientId"][0], params["message"][0])
+#                pdb.set_trace()
             else:
                 success = False
         else:
@@ -101,6 +118,18 @@ class Handler(SimpleHTTPRequestHandler):
         else:
             self.wfile.write("failure")
             
+    def getMessages(self, params):
+        print "checking messages"
+        success = True
+        ret = []
+        if("recipientId" in params):
+            ret = dataManager.dequeueMessages(params["recipientId"][0])
+        else:
+            success = False
+        if(success):
+            self.wfile.write(json.dumps(ret))
+        else:
+            self.wfile.write(json.dumps([])) #TODO is this the right thing to do?
 
 
 #Setup
