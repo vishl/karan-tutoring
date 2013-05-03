@@ -19,10 +19,9 @@ params['recipientId'] = 'user1'
 
 paramsEnc = urllib.urlencode(params)
 
-print "checked messages"
-f = urllib.urlopen("http://localhost:8000/checkmessages", paramsEnc)
+#print "checked messages"
+#f = urllib.urlopen("http://localhost:8000/checkmessages", paramsEnc)
+#print f.read()
+f = urllib.urlopen("http://localhost:8000/friends")
 print f.read()
 
-print "checked messages"
-f = urllib.urlopen("http://localhost:8000/checkmessages", paramsEnc)
-print f.read()

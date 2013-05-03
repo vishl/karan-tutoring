@@ -52,6 +52,9 @@ class Handler(SimpleHTTPRequestHandler):
         if(self.path=="/hello"):
             self.valid()
             self.wfile.write("Hello")
+        elif(self.path=="/friends"):
+            self.valid()
+            self.getFriends()
         else:
             self.invalid(404, "Invalid path")
             self.wfile.write("Path = " + self.path)
@@ -130,6 +133,10 @@ class Handler(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(ret))
         else:
             self.wfile.write(json.dumps([])) #TODO is this the right thing to do?
+
+    def getFriends(self):
+        print "getting friends"
+        self.wfile.write(json.dumps(dataManager.users.keys()))
 
 
 #Setup

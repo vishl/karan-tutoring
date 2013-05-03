@@ -34,7 +34,10 @@ class ServerInterface:
             return False
     
     def getUserList(self):
-        return ["friend1", "friend2"]
+        f=urllib.urlopen("http://"+self.ip+"/friends")
+
+        data = f.read()
+        return json.loads(data)
     
     def sendMessage(self, message, recipientId, senderId):
         params = {}
