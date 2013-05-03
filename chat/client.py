@@ -1,7 +1,21 @@
 from serverinterfacehttp import *
 import sys
+import thread
+import time
+cfm = []
+def check_message():
+    global cfm
+    while True:    
+        old = len(cfm)
+        cfm+=serverInterface.checkForMessages(username)
+        if len(cfm)>old:
+            print "you have a message!"
+        time.sleep(1)
+
 print "Welcome to KChat!"
-print "...It doesn't do much yet"
+
+
+
 if len(sys.argv) == 2:
     host = sys.argv[1]
 else:
@@ -23,11 +37,11 @@ while login == False:
 
 serverInterface.setStatus('online')
 print "You are logged in as",username
-
-cfm = serverInterface.checkForMessages(username)
-n=len(cfm)
-print "You have %i unread messages"%(n)
+thread.start_new_thread(check_message, ())
 while True:
+    
+
+
     m = raw_input("Would you like to see the messages or create amessage? Type c to check messages or n to create a message. Type q to quit. ")
 
     if m=='c':
